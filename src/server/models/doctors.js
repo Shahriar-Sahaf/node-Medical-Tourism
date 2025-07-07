@@ -31,5 +31,13 @@ const createDoctorTable = async() =>{
     }
 
 };
-module.exports = { createDoctorTable }
+
+
+const Alldoctors = async()=>{
+
+    const list = await pool.query("SELECT id, first_name,last_name ,specialty FROM doctors");
+
+    return list.rows;
+}
+module.exports = { createDoctorTable , Alldoctors}
 

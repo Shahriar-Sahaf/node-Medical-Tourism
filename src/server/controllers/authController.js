@@ -1,23 +1,30 @@
 const { createUser, checkUserExists, checkExistUser } = require('../models/user');
 
-exports.login = async(req,res)=>{
-    const { email, password } = req.body;
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
-    }
-  
-    const userExists = await checkExistUser(email, password); // Check if the user exists and password matches
-  
-    if (userExists) {
-      res.json({ message: "Login successful" });
-    } else {
-      res.status(401).json({ message: "Invalid email or password" });
-    }
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password are required" });
+  }
 
+  const dbUser = await checkExistUser(email, password);
 
-    
+  if (dbUser) {
+    // Convert snake_case to camelCase
+    const user = {
+      id: dbUser.id,
+      firstName: dbUser.first_name,
+      lastName: dbUser.last_name,
+      email: dbUser.email,
+    };
+
+    res.json({ message: "Login successful", user });
+  } else {
+    res.status(401).json({ message: "Invalid email or password" });
+  }
 };
+
+
 
 
 exports.signup =async(req,res)=>{

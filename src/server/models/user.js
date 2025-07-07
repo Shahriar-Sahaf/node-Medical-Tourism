@@ -53,26 +53,28 @@ const createUser = async (firstName, lastName, email, password) => {
 
 
 async function checkExistUser(email, password) {
-    try {
-        console.log("Checking user in database...");
-        const query = "SELECT * FROM userss WHERE email = $1";
-        const result = await pool.query(query, [email]);
+  try {
+    const query = "SELECT * FROM userss WHERE email = $1";
+    const result = await pool.query(query, [email]);
 
-        if (result.rows.length === 0) return false; // No user found
+    if (result.rows.length === 0) return null;
 
-        const user = result.rows[0];
-        console.log("Database user found:", user);
+    const user = result.rows[0];
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
 
-        // Compare hashed password
-        const isPasswordMatch = await bcrypt.compare(password, user.password);
-        console.log("Password match:", isPasswordMatch);
-
-        return isPasswordMatch;
-    } catch (error) {
-        console.error("Database error:", error);
-        return false;
+    if (isPasswordMatch) {
+      // Don't return password
+      const { password, ...userWithoutPassword } = user;
+      return userWithoutPassword;
+    } else {
+      return null;
     }
+  } catch (error) {
+    console.error("Database error:", error);
+    return null;
+  }
 }
+
 
 // Create the table when the app starts
 createUsersTable();
