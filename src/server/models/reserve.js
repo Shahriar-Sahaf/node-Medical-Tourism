@@ -11,13 +11,27 @@ const pool =new Pool({
 
 const Reservation = async () =>{
     const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS reservations (
-            id SERIAL PRIMARY KEY,
-            first_name VARCHAR(50) NOT NULL,
-            last_name VARCHAR(50) NOT NULL,
-            time VARCHAR(100) UNIQUE NOT NULL,
-            specialty VARCHAR(100) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        CREATE TABLE IF NOT EXISTS reservation (
+                id SERIAL PRIMARY KEY,
+
+            user_id INTEGER NOT NULL,
+            user_first_name VARCHAR(50),
+            user_last_name VARCHAR(50),
+            user_email VARCHAR(255),
+
+           
+            doctor_first_name VARCHAR(50),
+            doctor_last_name VARCHAR(50),
+
+            treatment VARCHAR(255),
+            package_tier VARCHAR(50),
+
+           
+            "date" DATE NOT NULL,
+            "time" VARCHAR(5) NOT NULL,
+
+          
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
         );
     `
     try {
@@ -29,20 +43,37 @@ const Reservation = async () =>{
 }
 
 
-const saveReservation = async(first_name ,last_name, time ,specialty)=>{
+const saveReservation = async(userId, user_first_name, user_last_name, user_email,treatment,
+     packageTier,doctor_first_name, doctor_last_name, date, time)=>{
 
 try {
 
-    await pool.query("INSERT INTO reservations (first_name ,last_name, time ,specialty) VALUES ($1, $2, $3, $4)",
-        [first_name,last_name,time, specialty]
-    )
-    
+    const query = `
+            INSERT INTO reservation (
+                user_id, user_first_name, user_last_name, user_email,
+                doctor_first_name, doctor_last_name,
+                treatment, package_tier,
+                "date", "time"
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        `;
+        
+        const values = [
+            userId, user_first_name, user_last_name, user_email,
+            treatment, packageTier,
+            doctor_first_name, doctor_last_name,
+            date, time
+        ];
+
+        await pool.query(query, values);
+
+    console.log("✅ Reservation saved successfully.");
+
 } catch (error) {
+    
       throw new Error(error);
     
 }
-
-
 
 
 }
