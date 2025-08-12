@@ -1,0 +1,11 @@
+.login-container {
+    height: 100vh;
+  }
+  
+  .login-box {
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    border-radius: 10px;
+  }
+  

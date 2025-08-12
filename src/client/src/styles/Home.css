@@ -1,0 +1,41 @@
+/* --- Hero Section Styles --- */
+.hero-section {
+  position: relative;
+  height: 90vh;
+  background: url('https://via.placeholder.com/1920x1080.png?text=Beautiful+Medical+Facility') no-repeat center center/cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 50, 100, 0.6); /* A professional blue overlay */
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* --- Service Card Styles --- */
+.service-card {
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.service-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* --- Doctor Image Styles --- */
+.doctor-img {
+  height: 280px;
+  object-fit: cover;
+  object-position: top; /* Ensures the top of the image (head) is shown */
+}
