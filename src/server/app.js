@@ -42,6 +42,8 @@ app.get('/api/doctors',doctorsControllers.doctorsList);
 app.post('/api/reservation',reserveController.save);
 
 // Start Server
+
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
