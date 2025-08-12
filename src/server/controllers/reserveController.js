@@ -3,16 +3,29 @@ const {saveReservation} = require('../models/reserve');
 
 
 const save = async(req,res)=>{
-    const{first_name ,last_name, time ,specialty} = req.body;
-
+   // const{selectedPackage,treatment,first_name ,last_name, time ,specialty} = req.body;
+      const {
+        userId,
+        user_first_name,
+        user_last_name,
+        user_email,
+        treatment,
+        packageTier,
+        doctor_first_name,
+        doctor_last_name,
+        date,
+        time
+    } = req.body;
 
     try {
 
-        const reserveTime = await saveReservation(first_name ,last_name, time ,specialty);
-        if (reserveTime) {
-            
-            return res.status(200).json({masssage :'Time Reserved Successfuly !!!'});
-        }
+    if (!userId || !treatment || !packageTier || !doctor_first_name || !date || !time) {
+        return res.status(400).json({ message: "Missing required reservation fields." });
+    }     
+        //must have relation with other tables
+        await saveReservation(userId, user_first_name, user_last_name, user_email, doctor_first_name, doctor_last_name, treatment, packageTier, date, time);
+       // const reserveTime = await saveReservation(selectedPackage,treatment,first_name,last_name,time,specialty);
+             res.status(200).json({message :'Time Reserved Successfully'});
 
         
     } catch (error) {
