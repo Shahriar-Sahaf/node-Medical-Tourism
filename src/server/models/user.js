@@ -15,7 +15,7 @@ const pool = new Pool({
 // Function to create users table if it doesn't exist
 const createUsersTable = async () => {
     const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS userss (
+        CREATE TABLE IF NOT EXISTS usser (
             id SERIAL PRIMARY KEY,
             first_name VARCHAR(50) NOT NULL,
             last_name VARCHAR(50) NOT NULL,
@@ -34,7 +34,7 @@ const createUsersTable = async () => {
 
 // Function to check if email exists
 const checkUserExists = async (email) => {
-    const result = await pool.query("SELECT * FROM userss WHERE email = $1", [email]);
+    const result = await pool.query("SELECT * FROM usser WHERE email = $1", [email]);
     return result.rows.length > 0;
 };
 
@@ -43,7 +43,7 @@ const createUser = async (firstName, lastName, email, password) => {
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         await pool.query(
-            "INSERT INTO userss (first_name, last_name, email, password) VALUES ($1, $2, $3, $4)",
+            "INSERT INTO usser (first_name, last_name, email, password) VALUES ($1, $2, $3, $4)",
             [firstName, lastName, email, hashedPassword]
         );
     } catch (error) {
@@ -54,7 +54,7 @@ const createUser = async (firstName, lastName, email, password) => {
 
 async function checkExistUser(email, password) {
   try {
-    const query = "SELECT * FROM userss WHERE email = $1";
+    const query = "SELECT * FROM usser WHERE email = $1";
     const result = await pool.query(query, [email]);
 
     if (result.rows.length === 0) return null;
