@@ -40,6 +40,7 @@ app.get('/api/doctors',doctorsControllers.doctorsList);
 
 //Reservation API
 app.post('/api/reservation',reserveController.save);
+app.get('/api/reservation/:userId', reserveController.getAllReservations);
 
 // Start Server
 
