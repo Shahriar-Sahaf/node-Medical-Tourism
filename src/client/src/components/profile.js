@@ -1,10 +1,12 @@
-import React from "react";
-import { Container, Button, Card } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Container, Button, Card, Table, Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const navigate = useNavigate();
   const storedUser = localStorage.getItem("user");
+  const [reservations, setReservations] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   let user = null;
   try {
@@ -15,9 +17,45 @@ const Profile = () => {
     console.error("Error parsing user from localStorage:", error);
   }
 
+  useEffect(() => {
+    if (user && user.id) {
+      fetchUserReservations();
+    }
+  }, [user]);
+
+  const fetchUserReservations = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/reservation/${user.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setReservations(data);
+      }
+    } catch (error) {
+      console.error("Error fetching reservations:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/login");
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const formatTime = (timeString) => {
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
   };
 
   if (!user) {
@@ -33,16 +71,69 @@ const Profile = () => {
   return (
     <Container className="mt-5">
       <h2 className="text-center mb-4 fw-bold text-success">User Profile</h2>
-      <Card className="text-center shadow-lg border-0 rounded-4 mx-auto p-3" style={{ maxWidth: "400px" }}>
+      
+      <Card className="text-center shadow-lg border-0 rounded-4 mx-auto p-3 mb-4" style={{ maxWidth: "400px" }}>
         <Card.Body>
           <Card.Title className="fw-bold text-dark">
-            {user.firstName} {user.lastName} {user.email.someProperty}
+            {user.firstName} {user.lastName}
           </Card.Title>
+          <Card.Text className="text-muted">
+            {user.email}
+          </Card.Text>
           <Button variant="danger" className="mt-3" onClick={handleLogout}>
             Logout
           </Button>
         </Card.Body>
       </Card>
+
+      <h3 className="text-center mb-4 text-primary">Your Reservations</h3>
+      
+      {loading ? (
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      ) : reservations.length === 0 ? (
+        <Card className="text-center shadow-sm">
+          <Card.Body>
+            <Card.Text className="text-muted">No reservations found.</Card.Text>
+          </Card.Body>
+        </Card>
+      ) : (
+        <div className="table-responsive">
+          <Table striped bordered hover className="shadow">
+            <thead className="table-primary">
+              <tr>
+                <th>Doctor</th>
+                <th>Treatment</th>
+                <th>Package</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reservations.map((reservation) => (
+                <tr key={reservation.id}>
+                  <td>
+                    Dr. {reservation.doctor_first_name} {reservation.doctor_last_name}
+                  </td>
+                  <td>{reservation.treatment}</td>
+                  <td>
+                    <Badge bg="info">{reservation.package_tier}</Badge>
+                  </td>
+                  <td>{formatDate(reservation.date)}</td>
+                  <td>{formatTime(reservation.time)}</td>
+                  <td>
+                    <Badge bg="success">Scheduled</Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
+      )}
     </Container>
   );
 };
