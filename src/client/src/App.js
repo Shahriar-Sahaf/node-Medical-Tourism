@@ -13,7 +13,9 @@ import Blogs from './components/blogs';
 import Profile from './components/profile';
 import Reservation from './components/reservation';
 import PackageSection from './components/packagesSection';
-import TreatmentPage from './components/TreatmentPage'; // The new reusable treatment page
+import TreatmentPage from './components/TreatmentPage'; // The new reusable treatment 
+import AdminLogin from './components/AdminLogin';
+import AdminDashboard from './components/AdminDashboard';
 
 // --- Utility Component ---
 import PrivateRoute from './components/privateRoute';
@@ -31,6 +33,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/blogs" element={<Blogs />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
           {/* --- Dynamic Treatment Detail Route --- */}
           {/* This single route handles all treatment pages like /treatments/cardiology, /treatments/dental-care, etc. */}
