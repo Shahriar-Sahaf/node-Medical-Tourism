@@ -1,26 +1,29 @@
 const express = require('express');
 const path = require('path');
 const bcrypt = require('bcryptjs');
-const cors = require('cors'); // Add CORS for frontend-backend communication
-const { createUser, checkUserExists, checkExistUser } = require('./models/user'); // Import models functions
+const cors = require('cors'); 
+const { createUser, checkUserExists, checkExistUser } = require('./models/user'); 
 const authController = require('./controllers/authController');
 const doctorsControllers = require('./controllers/doctorsControllers');
 const reserveController = require('./controllers/reserveController');
+const adminController = require('./controllers/adminController');
 const { createDoctorTable } = require('./models/doctors');
 const {Reservation} = require('./models/reserve');
+const { initializeAdminTables } = require('./models/admin');
 
 Reservation();
-createDoctorTable(); // ✅ Will run when you start the server
+createDoctorTable(); 
+initializeAdminTables();
 
 const app = express();
-const port = 3001; // Change to 3001 to avoid port conflict with React frontend
+const port = 3001;
 
 // Middleware
-app.use(cors()); // Allow requests from React frontend
-app.use(express.urlencoded({ extended: false })); // To parse form data
-app.use(express.json()); // Parse JSON data
+app.use(cors());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
-// Serve static files from React build folder in production
+
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
 
@@ -29,20 +32,23 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// Login API
+
 app.post('/api/login', authController.login);
-// Signup API
 app.post('/api/signup', authController.signup);
-//Doctors API
+
+// Admin routes
+app.post('/api/admin/login', adminController.adminLogin);
+app.get('/api/admin/dashboard', adminController.getDashboardStats);
+app.get('/api/admin/users', adminController.getAllUsers);
+app.delete('/api/admin/users/:userId', adminController.deleteUser);
+app.get('/api/admin/reservations', adminController.getAllReservations);
+
 app.get('/api/doctors',doctorsControllers.doctorsList);
-//app.post('/api/doctors',);
 
-
-//Reservation API
 app.post('/api/reservation',reserveController.save);
 app.get('/api/reservation/:userId', reserveController.getUserReservations);
 
-// Start Server
+
 
 
 app.listen(port, () => {
