@@ -77,12 +77,12 @@ const AdminDashboard = () => {
       </div>
 
       <div className="admin-actions">
-        <button onClick={() => navigate('/admin/users')} className="admin-btn">
-          Manage Users
-        </button>
-        <button onClick={() => navigate('/admin/reservations')} className="admin-btn">
-          Manage Reservations
-        </button>
+          <button onClick={() => navigate('/admin/users')} className="admin-btn">
+            Manage Users
+          </button>
+          <button onClick={() => navigate('/admin/reservations')} className="admin-btn">
+            Manage Reservations
+          </button>
       </div>
     </div>
   );
