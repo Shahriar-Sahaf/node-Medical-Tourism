@@ -169,6 +169,63 @@ button[type="submit"]:disabled {
   color: #666;
 }
 
+/* Admin Container Styles */
+.admin-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #eee;
+}
+
+.admin-header h1 {
+  color: #333;
+  margin: 0;
+}
+
+.back-btn {
+  padding: 10px 20px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.back-btn:hover {
+  background: #2980b9;
+}
+
+/* Table Styles */
+.table-container {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.table-container table {
+  margin: 0;
+}
+
+.table-container th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #333;
+}
+
+.table-container td {
+  vertical-align: middle;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .admin-login-form {
@@ -183,5 +240,14 @@ button[type="submit"]:disabled {
   .admin-actions {
     flex-direction: column;
     align-items: center;
+  }
+  
+  .admin-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .back-btn {
+    width: 100%;
   }
 }
