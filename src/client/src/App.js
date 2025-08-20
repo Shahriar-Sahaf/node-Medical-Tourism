@@ -16,6 +16,8 @@ import PackageSection from './components/packagesSection';
 import TreatmentPage from './components/TreatmentPage'; // The new reusable treatment 
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
+import AdminUsers from './components/AdminUsers';
+import AdminReservations from './components/AdminReservations';
 
 // --- Utility Component ---
 import PrivateRoute from './components/privateRoute';
@@ -35,6 +37,8 @@ function App() {
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/reservations" element={<AdminReservations />} />
 
           {/* --- Dynamic Treatment Detail Route --- */}
           {/* This single route handles all treatment pages like /treatments/cardiology, /treatments/dental-care, etc. */}
