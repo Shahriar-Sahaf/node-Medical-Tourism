@@ -12,11 +12,6 @@ const treatmentsData = {
     Icon: FaHeartbeat,
     color: 'text-danger',
     description: 'Our world-class cardiology department offers comprehensive care for heart-related conditions. We utilize the latest technology for diagnosis and treatment, ensuring the best possible outcomes for our patients.',
-    gallery: [
-      'https://via.placeholder.com/600x400.png?text=Modern+Heart+Clinic',
-      'https://via.placeholder.com/600x400.png?text=Surgical+Suite',
-      'https://via.placeholder.com/600x400.png?text=Patient+Recovery+Room',
-    ],
     procedures: ['Angioplasty', 'Bypass Surgery', 'Echocardiogram', 'Heart Valve Repair'],
   },
   'dental-care': {
@@ -118,11 +113,7 @@ const TreatmentPage = () => {
 
       <h3 className="text-center mb-4">Gallery</h3>
       <Row>
-        {treatment.gallery.map((src, index) => (
-          <Col md={4} key={index} className="mb-4">
-            <Image src={src} rounded thumbnail />
-          </Col>
-        ))}
+        
       </Row>
 
       <hr className="my-5" />

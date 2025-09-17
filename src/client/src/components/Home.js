@@ -3,7 +3,10 @@ import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { FaHeartbeat, FaTooth, FaEye, FaBone, FaBrain, FaStethoscope, FaUserMd, FaPlaneDeparture, FaPlusCircle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../styles/Home.css'; // We will create this new CSS file
+import '../styles/Home.css'; 
+import doctor1 from '../images/bruno-rodrigues-279xIHymPYY-unsplash.jpg'
+import doctor2 from '../images/humberto-chavez-FVh_yqLR9eA-unsplash.jpg'
+import doctor3 from '../images/usman-yousaf-pTrhfmj2jDA-unsplash.jpg'
 
 const Home = () => {
   const navigate = useNavigate();
@@ -18,10 +21,9 @@ const Home = () => {
   ];
 
   const doctors = [
-    { id: 1, name: "Dr. John Smith", specialty: "Cardiologist", image: "https://via.placeholder.com/300x300.png?text=Dr.+Smith" },
-    { id: 2, name: "Dr. Emily Johnson", specialty: "Neurologist", image: "https://via.placeholder.com/300x300.png?text=Dr.+Johnson" },
-    { id: 3, name: "Dr. Michael Brown", specialty: "Orthopedic Surgeon", image: "https://via.placeholder.com/300x300.png?text=Dr.+Brown" },
-  ];
+    { id: 1, name: "Dr. John Smith", specialty: "Cardiologist", image: doctor1 },
+    { id: 2, name: "Dr. Emily Johnson", specialty: "Neurologist", image: doctor2 },
+    { id: 3, name: "Dr. Michael Brown", specialty: "Orthopedic Surgeon", image: doctor3}]
 
   const testimonials = [
     { id: 1, name: "Sarah Williams, USA", feedback: "The quality of care I received was beyond my expectations. From the consultation to my recovery, everything was handled with utmost professionalism. I couldn't be happier with the results." },

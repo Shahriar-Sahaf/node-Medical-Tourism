@@ -32,7 +32,17 @@ const Reservation = () => {
         const fetchDoctors = async () => {
             try {
                 const res = await axios.get("http://localhost:3001/api/doctors");
-                setDoctors(res.data);
+                // Filter doctors based on treatment
+                const treatmentToSpecialty = {
+                    "Cardiology": "Cardiologist",
+                    "Dental Care": "Dentist",
+                    "Eye Surgery": "Ophthalmologist",
+                    "Orthopedics": "Orthopedic Surgeon",
+                    "Neurology": "Neurologist",
+                };
+                const specialty = treatmentToSpecialty[treatment];
+                const filteredDoctors = specialty ? res.data.filter(doc => doc.specialty === specialty) : res.data;
+                setDoctors(filteredDoctors);
             } catch (err) {
                 messageApi.error("Failed to fetch doctors.");
             } finally {

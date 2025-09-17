@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Container, Form, Button, Alert } from "react-bootstrap";
 import { FaUser, FaLock } from "react-icons/fa";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../styles/login.css";
 
 const Login = () => {
@@ -11,8 +11,7 @@ const Login = () => {
   const [messageColor, setMessageColor] = useState("danger");
 
   const navigate = useNavigate();
-  const location = useLocation();
-  const redirectPath = new URLSearchParams(location.search).get("redirect") || "/home";
+  const redirectPath = "/home";
 
   const handleSubmit = async (e) => {
     e.preventDefault();

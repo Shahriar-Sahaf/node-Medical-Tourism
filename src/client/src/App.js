@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 
 // --- Layout Components ---
 import Header from "./components/Header";
@@ -13,20 +13,25 @@ import Blogs from './components/blogs';
 import Profile from './components/profile';
 import Reservation from './components/reservation';
 import PackageSection from './components/packagesSection';
-import TreatmentPage from './components/TreatmentPage'; // The new reusable treatment 
+import TreatmentPage from './components/TreatmentPage'; // The new reusable treatment
+import AboutUs from './components/AboutUs';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 import AdminUsers from './components/AdminUsers';
+import AdminDoctors from './components/AdminDoctors';
 import AdminReservations from './components/AdminReservations';
 
 // --- Utility Component ---
 import PrivateRoute from './components/privateRoute';
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
   return (
-    <Router>
-      <Header />
-      <main style={{ paddingBottom: '80px'  }}> {/* Adds padding to prevent content from hiding under header/footer */}
+    <>
+      {!isAdminRoute && <Header />}
+      <main style={{ paddingBottom: isAdminRoute ? '0' : '80px' }}>
         <Routes>
           {/* --- Public Routes --- */}
           {/* These pages can be viewed by anyone */}
@@ -35,9 +40,11 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/blogs" element={<Blogs />} />
+          <Route path="/about" element={<AboutUs />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/doctors" element={<AdminDoctors />} />
           <Route path="/admin/reservations" element={<AdminReservations />} />
 
           {/* --- Dynamic Treatment Detail Route --- */}
@@ -72,7 +79,15 @@ function App() {
           />
         </Routes>
       </main>
-      <Footer />
+      {!isAdminRoute && <Footer />}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }

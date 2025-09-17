@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, Card, Table, Badge } from "react-bootstrap";
+import { Container, Button, Card, Table, Badge, Modal, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
@@ -7,6 +7,11 @@ const Profile = () => {
   const storedUser = localStorage.getItem("user");
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [reservationToCancel, setReservationToCancel] = useState(null);
+  const [cancelling, setCancelling] = useState(false);
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("success");
 
   let user = null;
   try {
@@ -56,6 +61,41 @@ const Profile = () => {
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const displayHour = hour % 12 || 12;
     return `${displayHour}:${minutes} ${ampm}`;
+  };
+
+  const handleCancelReservation = async () => {
+    if (!reservationToCancel) return;
+    setCancelling(true);
+    setMessage("");
+
+    try {
+      const response = await fetch(`http://localhost:3001/api/reservation/${reservationToCancel.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage("Reservation cancelled successfully.");
+        setMessageType("success");
+        setReservations(reservations.filter(r => r.id !== reservationToCancel.id));
+        setShowCancelModal(false);
+        setReservationToCancel(null);
+      } else {
+        setMessage(data.message || "Failed to cancel reservation.");
+        setMessageType("danger");
+      }
+    } catch (error) {
+      console.error("Error cancelling reservation:", error);
+      setMessage("Server error. Please try again.");
+      setMessageType("danger");
+    } finally {
+      setCancelling(false);
+    }
   };
 
   if (!user) {
@@ -111,6 +151,7 @@ const Profile = () => {
                 <th>Date</th>
                 <th>Time</th>
                 <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -128,11 +169,68 @@ const Profile = () => {
                   <td>
                     <Badge bg="success">Scheduled</Badge>
                   </td>
+                  <td>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => {
+                        setReservationToCancel(reservation);
+                        setShowCancelModal(true);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </Table>
         </div>
+      )}
+
+      {/* Cancel Confirmation Modal */}
+      <Modal show={showCancelModal} onHide={() => setShowCancelModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Cancel Reservation</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {reservationToCancel && (
+            <div>
+              <p>Are you sure you want to cancel this reservation?</p>
+              <div className="border p-3 rounded">
+                <p><strong>Doctor:</strong> Dr. {reservationToCancel.doctor_first_name} {reservationToCancel.doctor_last_name}</p>
+                <p><strong>Treatment:</strong> {reservationToCancel.treatment}</p>
+                <p><strong>Date:</strong> {formatDate(reservationToCancel.date)}</p>
+                <p><strong>Time:</strong> {formatTime(reservationToCancel.time)}</p>
+              </div>
+              <p className="text-danger mt-3">This action cannot be undone.</p>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowCancelModal(false)}>
+            Close
+          </Button>
+          <Button
+            variant="danger"
+            onClick={handleCancelReservation}
+            disabled={cancelling}
+          >
+            {cancelling ? "Cancelling..." : "Cancel Reservation"}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Alert Message */}
+      {message && (
+        <Alert
+          variant={messageType}
+          className="mt-3"
+          dismissible
+          onClose={() => setMessage("")}
+        >
+          {message}
+        </Alert>
       )}
     </Container>
   );
