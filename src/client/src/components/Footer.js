@@ -8,7 +8,6 @@ const Footer = () => {
     <footer className="bg-primary text-white py-4 mt-5">
       <Container>
         <Row className="gy-4">
-          {/* بخش درباره ما */}
           <Col md={4}>
             <h5 className="fw-bold">About Us</h5>
             <p className="small">
@@ -16,15 +15,15 @@ const Footer = () => {
             </p>
           </Col>
 
-          {/* لینک‌های مفید */}
+        
           <Col md={4}>
             <h5 className="fw-bold">Quick Links</h5>
             <ul className="list-unstyled">
               <li>
-                <Link to="/services" className="text-white text-decoration-none">Medical Services</Link>
+                <Link to="/blogs" className="text-white text-decoration-none">Blogs</Link>
               </li>
               <li>
-                <Link to="/destinations" className="text-white text-decoration-none">Treatment Destinations</Link>
+                <Link to="/" className="text-white text-decoration-none">Treatment</Link>
               </li>
               <li>
                 <Link to="/about" className="text-white text-decoration-none">About Us</Link>
@@ -32,17 +31,17 @@ const Footer = () => {
             </ul>
           </Col>
 
-          {/* اطلاعات تماس */}
+        
           <Col md={4}>
             <h5 className="fw-bold">Contact Us</h5>
             <p className="small">
-              <FaPhone className="me-2" /> +123 456 7890
+              <FaPhone className="me-2" /> 09338313346
             </p>
             <p className="small">
-              <FaEnvelope className="me-2" /> info@medicaltourism.com
+              <FaEnvelope className="me-2" /> shahriarsahaf@gmail.com
             </p>
 
-            {/* شبکه‌های اجتماعی */}
+          
             <div className="d-flex mt-3">
               <a href="https://wa.me/123456789" target="_blank" className="text-white me-3 fs-5">
                 <FaWhatsapp />
@@ -57,10 +56,9 @@ const Footer = () => {
           </Col>
         </Row>
 
-        {/* کپی‌رایت */}
         <hr className="mt-4 border-light" />
         <p className="text-center small mb-0">
-          © {new Date().getFullYear()} Medical Tourism. All rights reserved.
+          © {new Date().getFullYear()} Design By Shahriar Sahaf. All rights reserved.
         </p>
       </Container>
     </footer>

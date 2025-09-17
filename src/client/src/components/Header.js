@@ -60,8 +60,8 @@ const Header = () => {
               </Dropdown.Menu>
             </Dropdown>
 
-            <Nav.Link as={Link} to="/reservation" className="text-white fw-medium mx-3">
-              Reservation
+            <Nav.Link as={Link} to="/about" className="text-white fw-medium mx-3">
+              About Us
             </Nav.Link>
 
             <Nav.Link as={Link} to="/blogs" className="text-white fw-medium mx-3">
@@ -71,13 +71,13 @@ const Header = () => {
 
           {/* Social Media & Profile */}
           <Nav className="d-flex flex-row align-items-center">
-            <Nav.Link href="https://wa.me/YOUR_WHATSAPP_NUMBER" target="_blank" className="text-white mx-2">
+            <Nav.Link href="https://wa.me/09338313346" target="_blank" className="text-white mx-2">
               <FaWhatsapp />
             </Nav.Link>
-            <Nav.Link href="https://t.me/YOUR_TELEGRAM_USERNAME" target="_blank" className="text-white mx-2">
+            <Nav.Link href="https://t.me/iam-shahriar" target="_blank" className="text-white mx-2">
               <FaTelegram />
             </Nav.Link>
-            <Nav.Link href="https://www.instagram.com/YOUR_INSTAGRAM_USERNAME" target="_blank" className="text-white mx-2">
+            <Nav.Link href="https://www.instagram.com/iam_shahriar" target="_blank" className="text-white mx-2">
               <FaInstagram />
             </Nav.Link>
 
