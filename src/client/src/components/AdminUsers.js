@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Modal, Alert, Spinner } from 'react-bootstrap';
+import { Table, Button, Modal, Alert, Spinner, Form } from 'react-bootstrap';
 import './styles/admin.css';
 
 const AdminUsers = () => {
@@ -10,7 +10,16 @@ const AdminUsers = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [newUser, setNewUser] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    isAdmin: false
+  });
+  const [adding, setAdding] = useState(false);
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     const adminData = localStorage.getItem('adminData');
@@ -24,9 +33,20 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/admin/users');
+      const adminData = localStorage.getItem('adminData');
+      if (!adminData) {
+        navigate('/admin/login');
+        return;
+      }
+
+      const admin = JSON.parse(adminData);
+      const response = await fetch('http://localhost:3001/api/admin/users', {
+        headers: {
+          'x-admin-email': admin.email
+        }
+      });
       const data = await response.json();
-      
+
       if (response.ok) {
         setUsers(data);
       } else {
@@ -44,10 +64,18 @@ const AdminUsers = () => {
 
     setDeleting(true);
     try {
+      const adminData = localStorage.getItem('adminData');
+      if (!adminData) {
+        navigate('/admin/login');
+        return;
+      }
+
+      const admin = JSON.parse(adminData);
       const response = await fetch(`http://localhost:3001/api/admin/users/${userToDelete.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'x-admin-email': admin.email
         },
       });
 
@@ -69,6 +97,51 @@ const AdminUsers = () => {
   const confirmDelete = (user) => {
     setUserToDelete(user);
     setShowDeleteModal(true);
+  };
+
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+
+    setAdding(true);
+    setError('');
+
+    try {
+      const adminData = localStorage.getItem('adminData');
+      if (!adminData) {
+        navigate('/admin/login');
+        return;
+      }
+
+      const admin = JSON.parse(adminData);
+      const response = await fetch('http://localhost:3001/api/admin/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-email': admin.email
+        },
+        body: JSON.stringify(newUser),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUsers([...users, data.user]);
+        setNewUser({
+          firstName: '',
+          lastName: '',
+          email: '',
+          password: '',
+          isAdmin: false
+        });
+        setError('');
+      } else {
+        setError(data.message || 'Failed to add user');
+      }
+    } catch (error) {
+      setError('Server error. Please try again.');
+    } finally {
+      setAdding(false);
+    }
   };
 
   if (loading) {
@@ -93,6 +166,59 @@ const AdminUsers = () => {
       </div>
 
       {error && <Alert variant="danger">{error}</Alert>}
+
+      <div className="add-user-form">
+        <h3>Add New User</h3>
+        <Form onSubmit={handleAddUser}>
+          <Form.Group controlId="firstName" className="mb-2">
+            <Form.Label>First Name</Form.Label>
+            <Form.Control
+              type="text"
+              value={newUser.firstName}
+              onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
+              required
+            />
+          </Form.Group>
+          <Form.Group controlId="lastName" className="mb-2">
+            <Form.Label>Last Name</Form.Label>
+            <Form.Control
+              type="text"
+              value={newUser.lastName}
+              onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
+              required
+            />
+          </Form.Group>
+          <Form.Group controlId="email" className="mb-2">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              value={newUser.email}
+              onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+              required
+            />
+          </Form.Group>
+          <Form.Group controlId="password" className="mb-2">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              value={newUser.password}
+              onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+              required
+            />
+          </Form.Group>
+          <Form.Group controlId="isAdmin" className="mb-3">
+            <Form.Check
+              type="checkbox"
+              label="Make this user an admin"
+              checked={newUser.isAdmin}
+              onChange={(e) => setNewUser({ ...newUser, isAdmin: e.target.checked })}
+            />
+          </Form.Group>
+          <Button type="submit" variant="primary" className="mb-3" disabled={adding}>
+            {adding ? 'Adding...' : 'Add User'}
+          </Button>
+        </Form>
+      </div>
 
       <div className="table-container">
         <Table striped bordered hover responsive>

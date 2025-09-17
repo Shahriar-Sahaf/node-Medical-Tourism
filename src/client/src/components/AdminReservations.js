@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Table, Button, Badge, Alert, Spinner } from 'react-bootstrap';
-import './styles/admin.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Table, Button, Badge, Alert, Spinner } from "react-bootstrap";
+import "./styles/admin.css";
 
 const AdminReservations = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const adminData = localStorage.getItem('adminData');
+    const adminData = localStorage.getItem("adminData");
     if (!adminData) {
-      navigate('/admin/login');
+      navigate("/admin/login");
       return;
     }
 
@@ -21,44 +21,57 @@ const AdminReservations = () => {
 
   const fetchReservations = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/admin/reservations');
+      const adminData = localStorage.getItem("adminData");
+      if (!adminData) {
+        navigate("/admin/login");
+        return;
+      }
+      const admin = JSON.parse(adminData);
+      const response = await fetch(
+        "http://localhost:3001/api/admin/reservations",
+        {
+          headers: {
+            "x-admin-email": admin.email,
+          },
+        }
+      );
       const data = await response.json();
-      
+
       if (response.ok) {
         setReservations(data);
       } else {
-        setError('Failed to load reservations');
+        setError("Failed to load reservations");
       }
     } catch (error) {
-      setError('Server error. Please try again.');
+      setError("Server error. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const formatTime = (timeString) => {
-    const [hours, minutes] = timeString.split(':');
+    const [hours, minutes] = timeString.split(":");
     const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const ampm = hour >= 12 ? "PM" : "AM";
     const displayHour = hour % 12 || 12;
     return `${displayHour}:${minutes} ${ampm}`;
   };
 
   const getStatusBadge = (status) => {
     switch (status?.toLowerCase()) {
-      case 'scheduled':
+      case "scheduled":
         return <Badge bg="primary">Scheduled</Badge>;
-      case 'completed':
+      case "completed":
         return <Badge bg="success">Completed</Badge>;
-      case 'cancelled':
+      case "cancelled":
         return <Badge bg="danger">Cancelled</Badge>;
       default:
         return <Badge bg="secondary">{status}</Badge>;
@@ -81,7 +94,10 @@ const AdminReservations = () => {
     <div className="admin-container">
       <div className="admin-header">
         <h1>Reservation Management</h1>
-        <button onClick={() => navigate('/admin/dashboard')} className="back-btn">
+        <button
+          onClick={() => navigate("/admin/dashboard")}
+          className="back-btn"
+        >
           Back to Dashboard
         </button>
       </div>
@@ -107,13 +123,17 @@ const AdminReservations = () => {
             {reservations.map((reservation) => (
               <tr key={reservation.id}>
                 <td>{reservation.id}</td>
-                <td>{reservation.first_name} {reservation.last_name}</td>
+                <td>
+                  {reservation.first_name} {reservation.last_name}
+                </td>
                 <td>{reservation.email}</td>
                 <td>{reservation.treatment}</td>
                 <td>
                   <Badge bg="info">{reservation.package_tier}</Badge>
                 </td>
-                <td>{reservation.doctor_first_name} {reservation.doctor_last_name}</td>
+                <td>
+                  {reservation.doctor_first_name} {reservation.doctor_last_name}
+                </td>
                 <td>{formatDate(reservation.date)}</td>
                 <td>{formatTime(reservation.time)}</td>
                 <td>{getStatusBadge(reservation.status)}</td>

@@ -25,9 +25,19 @@ const AdminDashboard = () => {
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/admin/dashboard');
+      const adminData = localStorage.getItem('adminData');
+      if (!adminData) {
+        navigate('/admin/login');
+        return;
+      }
+      const admin = JSON.parse(adminData);
+      const response = await fetch('http://localhost:3001/api/admin/dashboard', {
+        headers: {
+          'x-admin-email': admin.email
+        }
+      });
       const data = await response.json();
-      
+
       if (response.ok) {
         setStats(data);
       } else {
@@ -79,6 +89,9 @@ const AdminDashboard = () => {
       <div className="admin-actions">
           <button onClick={() => navigate('/admin/users')} className="admin-btn">
             Manage Users
+          </button>
+          <button onClick={() => navigate('/admin/doctors')} className="admin-btn">
+            Manage Doctors
           </button>
           <button onClick={() => navigate('/admin/reservations')} className="admin-btn">
             Manage Reservations
