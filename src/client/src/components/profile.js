@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Container, Button, Card, Table, Badge, Modal, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { LanguageContext } from "../context/languageContext";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { language } = useContext(LanguageContext);
   const storedUser = localStorage.getItem("user");
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,6 +14,73 @@ const Profile = () => {
   const [cancelling, setCancelling] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("success");
+
+  const t = {
+    en: {
+      pleaseLogin: "Please log in first",
+      logIn: "Log In",
+      signUp: "Sign Up",
+      userProfile: "User Profile",
+      logout: "Logout",
+      yourReservations: "Your Reservations",
+      loading: "Loading...",
+      noReservations: "No reservations found.",
+      doctor: "Doctor",
+      treatment: "Treatment",
+      package: "Package",
+      date: "Date",
+      time: "Time",
+      status: "Status",
+      actions: "Actions",
+      scheduled: "Scheduled",
+      cancel: "Cancel",
+      cancelReservation: "Cancel Reservation",
+      confirmCancel: "Are you sure you want to cancel this reservation?",
+      doctorLabel: "Doctor:",
+      treatmentLabel: "Treatment:",
+      dateLabel: "Date:",
+      timeLabel: "Time:",
+      cannotUndo: "This action cannot be undone.",
+      close: "Close",
+      cancelling: "Cancelling...",
+      cancelReservationBtn: "Cancel Reservation",
+      reservationCancelled: "Reservation cancelled successfully.",
+      failedCancel: "Failed to cancel reservation.",
+      serverError: "Server error. Please try again.",
+    },
+    fa: {
+      pleaseLogin: "لطفا ابتدا وارد شوید",
+      logIn: "ورود",
+      signUp: "ثبت نام",
+      userProfile: "پروفایل کاربر",
+      logout: "خروج",
+      yourReservations: "رزروهای شما",
+      loading: "در حال بارگذاری...",
+      noReservations: "هیچ رزروی یافت نشد.",
+      doctor: "دکتر",
+      treatment: "درمان",
+      package: "بسته",
+      date: "تاریخ",
+      time: "زمان",
+      status: "وضعیت",
+      actions: "اقدامات",
+      scheduled: "برنامه ریزی شده",
+      cancel: "لغو",
+      cancelReservation: "لغو رزرو",
+      confirmCancel: "آیا مطمئن هستید که می‌خواهید این رزرو را لغو کنید؟",
+      doctorLabel: "دکتر:",
+      treatmentLabel: "درمان:",
+      dateLabel: "تاریخ:",
+      timeLabel: "زمان:",
+      cannotUndo: "این عمل قابل بازگشت نیست.",
+      close: "بستن",
+      cancelling: "در حال لغو...",
+      cancelReservationBtn: "لغو رزرو",
+      reservationCancelled: "رزرو با موفقیت لغو شد.",
+      failedCancel: "لغو رزرو ناموفق بود.",
+      serverError: "خطای سرور. لطفا دوباره امتحان کنید.",
+    },
+  }[language];
 
   let user = null;
   try {
@@ -30,7 +99,12 @@ const Profile = () => {
 
   const fetchUserReservations = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/reservation/${user.id}`);
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:3001/api/reservation/${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setReservations(data);
@@ -44,6 +118,7 @@ const Profile = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     navigate("/login");
   };
 
@@ -69,10 +144,12 @@ const Profile = () => {
     setMessage("");
 
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`http://localhost:3001/api/reservation/${reservationToCancel.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ userId: user.id }),
       });
@@ -80,18 +157,18 @@ const Profile = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("Reservation cancelled successfully.");
+        setMessage(t.reservationCancelled);
         setMessageType("success");
         setReservations(reservations.filter(r => r.id !== reservationToCancel.id));
         setShowCancelModal(false);
         setReservationToCancel(null);
       } else {
-        setMessage(data.message || "Failed to cancel reservation.");
+        setMessage(data.message || t.failedCancel);
         setMessageType("danger");
       }
     } catch (error) {
       console.error("Error cancelling reservation:", error);
-      setMessage("Server error. Please try again.");
+      setMessage(t.serverError);
       setMessageType("danger");
     } finally {
       setCancelling(false);
@@ -101,17 +178,17 @@ const Profile = () => {
   if (!user) {
     return (
       <Container className="mt-5 text-center">
-        <h2>Please log in first</h2>
-        <Button href="/login" variant="primary" className="me-2">Log In</Button>
-        <Button href="/signup" variant="secondary">Sign Up</Button>
+        <h2>{t.pleaseLogin}</h2>
+        <Button href="/login" variant="primary" className="me-2">{t.logIn}</Button>
+        <Button href="/signup" variant="secondary">{t.signUp}</Button>
       </Container>
     );
   }
 
   return (
     <Container className="mt-5">
-      <h2 className="text-center mb-4 fw-bold text-success">User Profile</h2>
-      
+      <h2 className="text-center mb-4 fw-bold text-success">{t.userProfile}</h2>
+
       <Card className="text-center shadow-lg border-0 rounded-4 mx-auto p-3 mb-4" style={{ maxWidth: "400px" }}>
         <Card.Body>
           <Card.Title className="fw-bold text-dark">
@@ -121,23 +198,23 @@ const Profile = () => {
             {user.email}
           </Card.Text>
           <Button variant="danger" className="mt-3" onClick={handleLogout}>
-            Logout
+            {t.logout}
           </Button>
         </Card.Body>
       </Card>
 
-      <h3 className="text-center mb-4 text-primary">Your Reservations</h3>
-      
+      <h3 className="text-center mb-4 text-primary">{t.yourReservations}</h3>
+
       {loading ? (
         <div className="text-center">
           <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden">{t.loading}</span>
           </div>
         </div>
       ) : reservations.length === 0 ? (
         <Card className="text-center shadow-sm">
           <Card.Body>
-            <Card.Text className="text-muted">No reservations found.</Card.Text>
+            <Card.Text className="text-muted">{t.noReservations}</Card.Text>
           </Card.Body>
         </Card>
       ) : (
@@ -145,13 +222,13 @@ const Profile = () => {
           <Table striped bordered hover className="shadow">
             <thead className="table-primary">
               <tr>
-                <th>Doctor</th>
-                <th>Treatment</th>
-                <th>Package</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{t.doctor}</th>
+                <th>{t.treatment}</th>
+                <th>{t.package}</th>
+                <th>{t.date}</th>
+                <th>{t.time}</th>
+                <th>{t.status}</th>
+                <th>{t.actions}</th>
               </tr>
             </thead>
             <tbody>
@@ -167,7 +244,7 @@ const Profile = () => {
                   <td>{formatDate(reservation.date)}</td>
                   <td>{formatTime(reservation.time)}</td>
                   <td>
-                    <Badge bg="success">Scheduled</Badge>
+                    <Badge bg="success">{t.scheduled}</Badge>
                   </td>
                   <td>
                     <Button
@@ -178,7 +255,7 @@ const Profile = () => {
                         setShowCancelModal(true);
                       }}
                     >
-                      Cancel
+                      {t.cancel}
                     </Button>
                   </td>
                 </tr>
@@ -191,32 +268,32 @@ const Profile = () => {
       {/* Cancel Confirmation Modal */}
       <Modal show={showCancelModal} onHide={() => setShowCancelModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Cancel Reservation</Modal.Title>
+          <Modal.Title>{t.cancelReservation}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {reservationToCancel && (
             <div>
-              <p>Are you sure you want to cancel this reservation?</p>
+              <p>{t.confirmCancel}</p>
               <div className="border p-3 rounded">
-                <p><strong>Doctor:</strong> Dr. {reservationToCancel.doctor_first_name} {reservationToCancel.doctor_last_name}</p>
-                <p><strong>Treatment:</strong> {reservationToCancel.treatment}</p>
-                <p><strong>Date:</strong> {formatDate(reservationToCancel.date)}</p>
-                <p><strong>Time:</strong> {formatTime(reservationToCancel.time)}</p>
+                <p><strong>{t.doctorLabel}</strong> Dr. {reservationToCancel.doctor_first_name} {reservationToCancel.doctor_last_name}</p>
+                <p><strong>{t.treatmentLabel}</strong> {reservationToCancel.treatment}</p>
+                <p><strong>{t.dateLabel}</strong> {formatDate(reservationToCancel.date)}</p>
+                <p><strong>{t.timeLabel}</strong> {formatTime(reservationToCancel.time)}</p>
               </div>
-              <p className="text-danger mt-3">This action cannot be undone.</p>
+              <p className="text-danger mt-3">{t.cannotUndo}</p>
             </div>
           )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowCancelModal(false)}>
-            Close
+            {t.close}
           </Button>
           <Button
             variant="danger"
             onClick={handleCancelReservation}
             disabled={cancelling}
           >
-            {cancelling ? "Cancelling..." : "Cancel Reservation"}
+            {cancelling ? t.cancelling : t.cancelReservationBtn}
           </Button>
         </Modal.Footer>
       </Modal>

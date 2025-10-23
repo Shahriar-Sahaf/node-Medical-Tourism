@@ -1,12 +1,10 @@
 const express = require('express');
 const path = require('path');
 const bcrypt = require('bcryptjs');
-const cors = require('cors'); 
-const { createUser, checkUserExists, checkExistUser } = require('./models/user'); 
-const authController = require('./controllers/authController');
-const doctorsControllers = require('./controllers/doctorsControllers');
-const reserveController = require('./controllers/reserveController');
-const adminController = require('./controllers/adminController');
+const cors = require('cors');
+const authRouter = require('./routes/authRouter');
+const adminRouter = require('./routes/adminRouter');
+const reserveRouter = require('./routes/reserveRouter');
 const { createDoctorTable } = require('./models/doctors');
 const {Reservation} = require('./models/reserve');
 const { initializeAdminTables } = require('./models/admin');
@@ -33,20 +31,11 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 
-app.post('/api/login', authController.login);
-app.post('/api/signup', authController.signup);
-
-// Admin routes
-app.post('/api/admin/login', adminController.adminLogin);
-app.get('/api/admin/dashboard', adminController.getDashboardStats);
-app.get('/api/admin/users', adminController.getAllUsers);
-app.delete('/api/admin/users/:userId', adminController.deleteUser);
-app.get('/api/admin/reservations', adminController.getAllReservations);
-
-app.get('/api/doctors',doctorsControllers.doctorsList);
-
-app.post('/api/reservation',reserveController.save);
-app.get('/api/reservation/:userId', reserveController.getUserReservations);
+  
+// Use routers
+app.use('/api', authRouter);
+app.use('/api/admin', adminRouter);
+app.use('/api', reserveRouter);
 
 
 

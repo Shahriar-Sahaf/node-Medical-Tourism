@@ -2,7 +2,7 @@
 .hero-section {
   position: relative;
   height: 90vh;
-  background: url('https://via.placeholder.com/1920x1080.png?text=Beautiful+Medical+Facility') no-repeat center center/cover;
+  background: url('../images/covid-still-life-with-vaccine.jpg') no-repeat center center/cover;
   display: flex;
   align-items: center;
   justify-content: center;

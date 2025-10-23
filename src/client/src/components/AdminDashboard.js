@@ -96,6 +96,9 @@ const AdminDashboard = () => {
           <button onClick={() => navigate('/admin/reservations')} className="admin-btn">
             Manage Reservations
           </button>
+          <button onClick={() => navigate('/admin/add-admin')} className="admin-btn">
+            Add New Admin
+          </button>
       </div>
     </div>
   );

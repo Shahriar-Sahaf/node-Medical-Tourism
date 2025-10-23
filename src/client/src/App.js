@@ -7,22 +7,24 @@ import Footer from './components/Footer';
 
 // --- Page Components ---
 import Home from './components/Home';
-import LoginPage from './components/Loginpage'; // Renamed for consistency
+import LoginPage from './components/Loginpage';
 import Signup from './components/Signup';
 import Blogs from './components/blogs';
 import Profile from './components/profile';
 import Reservation from './components/reservation';
 import PackageSection from './components/packagesSection';
-import TreatmentPage from './components/TreatmentPage'; // The new reusable treatment
+import TreatmentPage from './components/TreatmentPage';
 import AboutUs from './components/AboutUs';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 import AdminUsers from './components/AdminUsers';
 import AdminDoctors from './components/AdminDoctors';
 import AdminReservations from './components/AdminReservations';
+import AddAdmin from './components/AddAdmin';
 
 // --- Utility Component ---
 import PrivateRoute from './components/privateRoute';
+import  {LanguageProvider}  from "./context/languageContext"; // 👈 اضافه شده
 
 function AppContent() {
   const location = useLocation();
@@ -33,8 +35,6 @@ function AppContent() {
       {!isAdminRoute && <Header />}
       <main style={{ paddingBottom: isAdminRoute ? '0' : '80px' }}>
         <Routes>
-          {/* --- Public Routes --- */}
-          {/* These pages can be viewed by anyone */}
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<LoginPage />} />
@@ -46,13 +46,8 @@ function AppContent() {
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/doctors" element={<AdminDoctors />} />
           <Route path="/admin/reservations" element={<AdminReservations />} />
-
-          {/* --- Dynamic Treatment Detail Route --- */}
-          {/* This single route handles all treatment pages like /treatments/cardiology, /treatments/dental-care, etc. */}
+          <Route path="/admin/add-admin" element={<AddAdmin />} />
           <Route path="/treatments/:slug" element={<TreatmentPage />} />
-
-          {/* --- Private Routes --- */}
-          {/* These pages require the user to be logged in */}
           <Route
             path="/packages"
             element={
@@ -86,9 +81,11 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <LanguageProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </LanguageProvider>
   );
 }
 

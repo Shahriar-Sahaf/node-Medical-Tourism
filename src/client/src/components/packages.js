@@ -1,16 +1,26 @@
 // Static data for treatment packages
-export const options = [
-  "Visa Assistance",
-  "SIM Card",
-  "Airport Transfer",
-  "Translation Services",
-  "Accommodation",
-  "Medical Insurance"
-];
+export const options = {
+  en: {
+    visa: "Visa Assistance",
+    sim: "SIM Card",
+    transfer: "Airport Transfer",
+    translation: "Translation Services",
+    accommodation: "Accommodation",
+    insurance: "Medical Insurance"
+  },
+  fa: {
+    visa: "کمک ویزا",
+    sim: "سیم کارت",
+    transfer: "انتقال فرودگاهی",
+    translation: "خدمات ترجمه",
+    accommodation: "اقامت",
+    insurance: "بیمه پزشکی"
+  }
+};
 
 export const packages = {
-  Bronze: ["Visa Assistance", "SIM Card"],
-  Silver: ["Visa Assistance", "SIM Card", "Airport Transfer", "Accommodation"],
-  Gold: [...options]
+  Bronze: ["visa", "sim"],
+  Silver: ["visa", "sim", "transfer", "accommodation"],
+  Gold: ["visa", "sim", "transfer", "translation", "accommodation", "insurance"]
 };
      

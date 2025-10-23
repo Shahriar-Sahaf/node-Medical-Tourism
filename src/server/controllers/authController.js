@@ -1,4 +1,5 @@
 const { createUser, checkUserExists, checkExistUser } = require('../models/user');
+const jwt = require('jsonwebtoken');
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
@@ -10,7 +11,7 @@ exports.login = async (req, res) => {
   const dbUser = await checkExistUser(email, password);
 
   if (dbUser) {
-    // Convert snake_case to camelCase
+    // Convert snake_case to camelCase for frontend
     const user = {
       id: dbUser.id,
       firstName: dbUser.first_name,
@@ -18,18 +19,18 @@ exports.login = async (req, res) => {
       email: dbUser.email,
     };
 
-    res.json({ message: "Login successful", user });
+
+    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET || 'secret-key', { expiresIn: '1h' });
+
+    res.json({ message: "Login successful", user, token });
   } else {
     res.status(401).json({ message: "Invalid email or password" });
   }
 };
 
-
-
-
 exports.signup =async(req,res)=>{
 
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password, passport } = req.body;
 
     try {
       // Check if user already exists
@@ -38,9 +39,10 @@ exports.signup =async(req,res)=>{
         return res.status(400).json({ message: 'Email already registered!' });
       }
   
-      // Create a new user
-      await createUser(firstName, lastName, email, password);
-      res.status(201).json({ message: 'User registered successfully!' });
+      
+      const userId = await createUser(firstName, lastName, email, password, passport);
+      const token = jwt.sign({ id: userId, email }, process.env.JWT_SECRET || 'secret-key', { expiresIn: '1h' });
+      res.status(201).json({ message: 'User registered successfully!', token });
   
     } catch (error) {
       console.error('Error:', error);

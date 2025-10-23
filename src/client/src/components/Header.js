@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { Navbar, Nav, Container, Button, Dropdown } from "react-bootstrap";
 import {
@@ -13,63 +13,91 @@ import {
   FaBone,
   FaBrain
 } from "react-icons/fa";
+import  {LanguageContext} from "../context/languageContext";
 
 const Header = () => {
+  const { language, toggleLanguage } = useContext(LanguageContext);
+
+  const t = {
+    en: {
+      home: "Home",
+      treatments: "Treatments",
+      about: "About Us",
+      blogs: "Blogs",
+      profile: "Profile",
+      cardiology: "Cardiology",
+      dental: "Dental Care",
+      eye: "Eye Surgery",
+      ortho: "Orthopedics",
+      neuro: "Neurology",
+    },
+    fa: {
+      home: "خانه",
+      treatments: "درمان‌ها",
+      about: "درباره ما",
+      blogs: "وبلاگ",
+      profile: "پروفایل",
+      cardiology: "قلب و عروق",
+      dental: "دندان‌پزشکی",
+      eye: "جراحی چشم",
+      ortho: "ارتوپدی",
+      neuro: "نورولوژی",
+    },
+  }[language];
+
   return (
-    <Navbar bg="primary" variant="dark" expand="lg"  sticky="top" className="shadow">
+    <Navbar bg="primary" variant="dark" expand="lg" sticky="top" className="shadow">
       <Container>
-        {/* Logo / Brand */}
         <Navbar.Brand as={Link} to="/" className="fw-bold fs-4 text-white d-flex align-items-center">
           <FaStethoscope className="me-2" />
           Medical Tourism
         </Navbar.Brand>
+
         <Navbar.Toggle aria-controls="navbar-nav" />
         <Navbar.Collapse id="navbar-nav" className="justify-content-between">
           <Nav className="d-flex flex-row w-100 justify-content-center align-items-center">
             <Nav.Link as={Link} to="/home" className="text-white fw-medium mx-3">
-              Home
+              {t.home}
             </Nav.Link>
 
-            {/* Treatment Dropdown Linking to Detail Pages */}
             <Dropdown className="mx-3">
               <Dropdown.Toggle variant="outline-light" id="dropdown-treatment">
-                Treatments
+                {t.treatments}
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
                 <Dropdown.Item as={Link} to="/treatments/cardiology">
                   <FaHeartbeat className="me-2 text-danger" />
-                  Cardiology
+                  {t.cardiology}
                 </Dropdown.Item>
                 <Dropdown.Item as={Link} to="/treatments/dental-care">
                   <FaTooth className="me-2 text-warning" />
-                  Dental Care
+                  {t.dental}
                 </Dropdown.Item>
                 <Dropdown.Item as={Link} to="/treatments/eye-surgery">
                   <FaEye className="me-2 text-info" />
-                  Eye Surgery
+                  {t.eye}
                 </Dropdown.Item>
                 <Dropdown.Item as={Link} to="/treatments/orthopedics">
                   <FaBone className="me-2 text-secondary" />
-                  Orthopedics
+                  {t.ortho}
                 </Dropdown.Item>
                 <Dropdown.Item as={Link} to="/treatments/neurology">
                   <FaBrain className="me-2 text-primary" />
-                  Neurology
+                  {t.neuro}
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
 
             <Nav.Link as={Link} to="/about" className="text-white fw-medium mx-3">
-              About Us
+              {t.about}
             </Nav.Link>
 
             <Nav.Link as={Link} to="/blogs" className="text-white fw-medium mx-3">
-              Blogs
+              {t.blogs}
             </Nav.Link>
           </Nav>
 
-          {/* Social Media & Profile */}
           <Nav className="d-flex flex-row align-items-center">
             <Nav.Link href="https://wa.me/09338313346" target="_blank" className="text-white mx-2">
               <FaWhatsapp />
@@ -83,7 +111,16 @@ const Header = () => {
 
             <Button as={Link} to="/profile" variant="light" className="ms-3 d-flex align-items-center">
               <FaUserCircle className="me-2" size={20} />
-              Profile
+              {t.profile}
+            </Button>
+
+            {/* 👇 دکمه تغییر زبان */}
+            <Button
+              variant="outline-light"
+              className="ms-3"
+              onClick={toggleLanguage}
+            >
+              {language === "en" ? "FA" : "EN"}
             </Button>
           </Nav>
         </Navbar.Collapse>

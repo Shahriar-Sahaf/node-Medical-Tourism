@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Badge, Alert, Spinner } from "react-bootstrap";
+import { Table, Button, Badge, Alert, Spinner, Modal } from "react-bootstrap";
 import "./styles/admin.css";
 
 const AdminReservations = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [reservationToDelete, setReservationToDelete] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -78,6 +80,45 @@ const AdminReservations = () => {
     }
   };
 
+  const handleDeleteClick = (reservation) => {
+    setReservationToDelete(reservation);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!reservationToDelete) return;
+
+    try {
+      const adminData = localStorage.getItem("adminData");
+      if (!adminData) {
+        navigate("/admin/login");
+        return;
+      }
+      const admin = JSON.parse(adminData);
+      const response = await fetch(
+        `http://localhost:3001/api/admin/reservations/${reservationToDelete.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "x-admin-email": admin.email,
+          },
+        }
+      );
+
+      if (response.ok) {
+        setReservations(reservations.filter(r => r.id !== reservationToDelete.id));
+        setError("");
+      } else {
+        setError("Failed to delete reservation");
+      }
+    } catch (error) {
+      setError("Server error. Please try again.");
+    } finally {
+      setShowDeleteModal(false);
+      setReservationToDelete(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="admin-container">
@@ -117,6 +158,7 @@ const AdminReservations = () => {
               <th>Date</th>
               <th>Time</th>
               <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -137,11 +179,47 @@ const AdminReservations = () => {
                 <td>{formatDate(reservation.date)}</td>
                 <td>{formatTime(reservation.time)}</td>
                 <td>{getStatusBadge(reservation.status)}</td>
+                <td>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleDeleteClick(reservation)}
+                  >
+                    Delete
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>
         </Table>
       </div>
+
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete this reservation? This action cannot be undone.
+          {reservationToDelete && (
+            <div className="mt-3">
+              <strong>Reservation Details:</strong>
+              <p>ID: {reservationToDelete.id}</p>
+              <p>Patient: {reservationToDelete.first_name} {reservationToDelete.last_name}</p>
+              <p>Treatment: {reservationToDelete.treatment}</p>
+              <p>Date: {formatDate(reservationToDelete.date)}</p>
+              <p>Time: {formatTime(reservationToDelete.time)}</p>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            Delete Reservation
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

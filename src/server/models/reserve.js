@@ -1,12 +1,4 @@
-const {Pool} = require("pg")
-
-const pool =new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'mydb',
-    password: '8066',
-    port: 5432,
-})
+const pool = require('../config/database')
 
 
 const Reservation = async () =>{
@@ -24,14 +16,13 @@ const Reservation = async () =>{
         );
     `
     
-    // Migration query to update existing table structure
+   
     const migrationQueries = [
-        // Add foreign key constraint if table exists
         `ALTER TABLE reservation 
          ADD CONSTRAINT fk_user 
          FOREIGN KEY (user_id) REFERENCES usser(id) ON DELETE CASCADE`,
         
-        // Drop user info columns if they exist
+        
         `ALTER TABLE reservation 
          DROP COLUMN IF EXISTS user_first_name`,
         
@@ -45,7 +36,7 @@ const Reservation = async () =>{
     try {
         await pool.query(createTableQuery);
         
-        // Run migration queries
+       
         for (const query of migrationQueries) {
             try {
                 await pool.query(query);
@@ -55,9 +46,9 @@ const Reservation = async () =>{
             }
         }
         
-        console.log("✅ Reservations table is ready with proper foreign key.");
+        console.log("Reservations table is ready with proper foreign key.");
     } catch (error) {
-        console.error("❌ Error creating Reservations table:", error);
+        console.error(" Error creating Reservations table:", error);
     }
 }
 
@@ -80,7 +71,7 @@ const saveReservation = async(userId, treatment, packageTier, doctor_first_name,
         ];
 
         await pool.query(query, values);
-        console.log("✅ Reservation saved successfully.");
+        console.log("Reservation saved successfully.");
     } catch (error) {
         throw new Error(error);
     }
@@ -115,37 +106,47 @@ const getReservationsWithUserInfo = async () => {
 }
 
 
-const getReservationByIdWithUserInfo = async (reservationId) => {
+const getReservationsByUserId = async (userId) => {
     try {
         const query = `
-            SELECT 
-                r.*,
-                u.first_name as user_first_name,
-                u.last_name as user_last_name,
-                u.email as user_email
-            FROM reservation r
-            JOIN usser u ON r.user_id = u.id
-            WHERE r.id = $1
+            SELECT * FROM reservation
+            WHERE user_id = $1
+            ORDER BY created_at DESC
         `;
-        
-        const result = await pool.query(query, [reservationId]);
-        return result.rows[0];
+
+        const result = await pool.query(query, [userId]);
+        return result.rows;
     } catch (error) {
         throw new Error(error);
     }
 }
 
-
-const getReservationsByUserId = async (userId) => {
+const getReservationsByDoctorDateTime = async (doctor_first_name, doctor_last_name, date, time) => {
     try {
         const query = `
-            SELECT * FROM reservation 
-            WHERE user_id = $1 
-            ORDER BY created_at DESC
+            SELECT * FROM reservation
+            WHERE doctor_first_name = $1
+            AND doctor_last_name = $2
+            AND date = $3
+            AND time = $4
         `;
-        
-        const result = await pool.query(query, [userId]);
+
+        const result = await pool.query(query, [doctor_first_name, doctor_last_name, date, time]);
         return result.rows;
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
+const deleteReservation = async (reservationId) => {
+    try {
+        const query = `
+            DELETE FROM reservation
+            WHERE id = $1
+        `;
+
+        const result = await pool.query(query, [reservationId]);
+        return result.rowCount > 0; // Returns true if a row was deleted
     } catch (error) {
         throw new Error(error);
     }
@@ -155,7 +156,8 @@ module.exports = {
     Reservation,
     saveReservation,
     getReservationsWithUserInfo,
-    getReservationByIdWithUserInfo,
-    getReservationsByUserId
+    getReservationsByUserId,
+    getReservationsByDoctorDateTime,
+    deleteReservation
 }
 

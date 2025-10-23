@@ -1,16 +1,6 @@
-const { Pool } = require("pg");
+const pool = require('../config/database');
 const bcrypt = require("bcryptjs");
 
-// PostgreSQL Connection Pool
-const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'mydb',
-    password: '8066',
-    port: 5432,
-});
-
-// Function to add is_admin column to users table
 const addAdminColumn = async () => {
     const alterTableQuery = `
         ALTER TABLE usser 
@@ -19,13 +9,12 @@ const addAdminColumn = async () => {
     `;
     try {
         await pool.query(alterTableQuery);
-        console.log("✅ Admin column added to users table.");
+        console.log("Admin column added to users table.");
     } catch (error) {
-        console.error("❌ Error adding admin column:", error);
+        console.error(" Error adding admin column:", error);
     }
 };
 
-// Function to create admin_logs table
 const createAdminLogsTable = async () => {
     const createTableQuery = `
         CREATE TABLE IF NOT EXISTS admin_logs (
@@ -39,34 +28,50 @@ const createAdminLogsTable = async () => {
     `;
     try {
         await pool.query(createTableQuery);
-        console.log("✅ Admin logs table is ready.");
+        console.log("Admin logs table is ready.");
     } catch (error) {
-        console.error("❌ Error creating admin logs table:", error);
+        console.error(" Error creating admin logs table:", error);
     }
 };
 
-// Function to check if user is admin
+
 const checkIfAdmin = async (email) => {
     const query = "SELECT id, first_name, last_name, email, is_admin FROM usser WHERE email = $1 AND is_admin = TRUE";
     const result = await pool.query(query, [email]);
     return result.rows[0] || null;
 };
 
-// Function to get all users for admin
+
 const getAllUsers = async () => {
     const query = "SELECT id, first_name, last_name, email, created_at FROM usser WHERE is_admin = FALSE ORDER BY created_at DESC";
     const result = await pool.query(query);
     return result.rows;
 };
 
-// Function to delete user
+
+const addUser = async (firstName, lastName, email, password, isAdmin = false) => {
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const query = `
+            INSERT INTO usser (first_name, last_name, email, password, is_admin)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING id, first_name, last_name, email, is_admin, created_at
+        `;
+        const result = await pool.query(query, [firstName, lastName, email, hashedPassword, isAdmin]);
+        return result.rows[0];
+    } catch (error) {
+        throw new Error('Error creating user: ' + error.message);
+    }
+};
+
+
 const deleteUser = async (userId) => {
     const query = "DELETE FROM usser WHERE id = $1 AND is_admin = FALSE RETURNING *";
     const result = await pool.query(query, [userId]);
     return result.rows[0];
 };
 
-// Function to get admin dashboard stats
+
 const getDashboardStats = async () => {
     const queries = [
         "SELECT COUNT(*) as total_users FROM usser WHERE is_admin = FALSE",
@@ -84,7 +89,7 @@ const getDashboardStats = async () => {
     };
 };
 
-// Function to log admin actions
+
 const logAdminAction = async (adminId, action, details, ipAddress) => {
     const query = `
         INSERT INTO admin_logs (admin_id, action, details, ip_address) 
@@ -93,7 +98,20 @@ const logAdminAction = async (adminId, action, details, ipAddress) => {
     await pool.query(query, [adminId, action, JSON.stringify(details), ipAddress]);
 };
 
-// Initialize admin tables
+
+const getAllReservations = async()=>{
+ const query = `SELECT r.*, u.first_name, u.last_name, u.email 
+            FROM reservation r 
+            JOIN usser u ON r.user_id = u.id 
+            ORDER BY r.created_at DESC`;
+
+
+    const result = await pool.query(query);
+    return result;
+
+}
+
+
 const initializeAdminTables = async () => {
     await addAdminColumn();
     await createAdminLogsTable();
@@ -102,8 +120,10 @@ const initializeAdminTables = async () => {
 module.exports = {
     checkIfAdmin,
     getAllUsers,
+    addUser,
     deleteUser,
     getDashboardStats,
     logAdminAction,
-    initializeAdminTables
+    initializeAdminTables,
+    getAllReservations
 };
